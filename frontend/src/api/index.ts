@@ -88,6 +88,19 @@ export const feedingApi = {
   delete: (id: number) => api.delete(`/feeding-records/${id}`),
 };
 
+// ========== 笼舍管理 API ==========
+export const cageApi = {
+  getList: (params?: any) => api.get('/cages', { params }),
+  getDetail: (id: number) => api.get(`/cages/${id}`),
+  create: (data: any) => api.post('/cages', data),
+  update: (id: number, data: any) => api.patch(`/cages/${id}`, data),
+  delete: (id: number) => api.delete(`/cages/${id}`),
+  assignAnimal: (id: number, animalId: number) =>
+    api.post(`/cages/${id}/animals`, { animalId }),
+  removeAnimal: (id: number, animalId: number) =>
+    api.delete(`/cages/${id}/animals/${animalId}`),
+};
+
 // ========== 统计 API ==========
 export const statisticsApi = {
   getOverview: () => api.get('/statistics/overview'),
