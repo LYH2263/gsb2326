@@ -200,3 +200,38 @@ INSERT INTO `feeding_records` (`animal_id`, `feed_date`, `feed_time`, `food_type
 (1, '2026-01-21', '08:00:00', '标准啮齿类动物饲料', 5.00, 'g', 8.00, '小李', '正常进食'),
 (2, '2026-01-21', '08:00:00', '标准啮齿类动物饲料', 4.80, 'g', 7.20, '小李', '正常进食'),
 (6, '2026-01-21', '08:00:00', '标准大鼠饲料', 24.00, 'g', 33.00, '小张', '正常进食');
+
+-- ========================================
+-- 笼舍管理表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `cages` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `cage_code` VARCHAR(50) NOT NULL UNIQUE COMMENT '笼舍编号',
+  `room` VARCHAR(100) NOT NULL COMMENT '所在房间',
+  `type` ENUM('mouse', 'rat', 'rabbit', 'guinea_pig', 'other') NOT NULL DEFAULT 'mouse' COMMENT '笼舍类型',
+  `max_capacity` INT NOT NULL COMMENT '最大容量',
+  `status` ENUM('idle', 'in_use', 'full', 'maintenance') NOT NULL DEFAULT 'idle' COMMENT '状态',
+  `description` TEXT COMMENT '备注',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_status` (`status`),
+  INDEX `idx_room` (`room`),
+  INDEX `idx_cage_code` (`cage_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='笼舍管理表';
+
+-- ========================================
+-- 种子数据：笼舍
+-- ========================================
+INSERT INTO `cages` (`cage_code`, `room`, `type`, `max_capacity`, `status`, `description`) VALUES
+('A-101', 'A区饲养室1', 'mouse', 5, 'in_use', '小鼠饲养笼，标准IVC笼'),
+('A-102', 'A区饲养室1', 'mouse', 5, 'in_use', '小鼠饲养笼，标准IVC笼'),
+('A-103', 'A区饲养室1', 'mouse', 5, 'idle', '小鼠饲养笼，标准IVC笼'),
+('A-104', 'A区饲养室1', 'mouse', 5, 'maintenance', '消毒中，暂不可用'),
+('A-105', 'A区饲养室1', 'mouse', 5, 'idle', '小鼠饲养笼，备用'),
+('B-201', 'B区饲养室1', 'rat', 3, 'in_use', '大鼠饲养笼'),
+('B-202', 'B区饲养室1', 'rat', 3, 'in_use', '大鼠饲养笼'),
+('B-203', 'B区饲养室1', 'rat', 3, 'idle', '大鼠饲养笼'),
+('C-301', 'C区饲养室', 'rabbit', 2, 'in_use', '兔笼，单笼饲养'),
+('C-302', 'C区饲养室', 'rabbit', 2, 'in_use', '兔笼，检疫专用'),
+('D-401', 'D区饲养室', 'guinea_pig', 4, 'in_use', '豚鼠饲养笼'),
+('D-402', 'D区饲养室', 'guinea_pig', 4, 'idle', '豚鼠饲养笼，备用');

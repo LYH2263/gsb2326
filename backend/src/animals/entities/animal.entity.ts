@@ -40,8 +40,8 @@ export class Animal {
   })
   status: string;
 
-  @Column({ name: 'cage_number', length: 50, nullable: true })
-  cageNumber: string;
+  @Column({ name: 'cage_number', type: 'varchar', length: 50, nullable: true })
+  cageNumber: string | null;
 
   @Column({ name: 'rfid_tag', length: 100, nullable: true })
   rfidTag: string;
