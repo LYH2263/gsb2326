@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.DS_Store
+.env.local
+.env.development
+*.log
+.idea/
+.vscode/
+__pycache__/
+.venv/
+coverage/
+.nyc_output/
+
+# 项目题目说明文件
+题目.md
