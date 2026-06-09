@@ -42,6 +42,11 @@ export class CreateAnimalDto {
   @MaxLength(50)
   cageNumber?: string;
 
+  @ApiPropertyOptional({ description: '笼舍ID' })
+  @IsOptional()
+  @IsNumber()
+  cageId?: number;
+
   @ApiPropertyOptional({ description: 'RFID标签' })
   @IsOptional()
   @IsString()

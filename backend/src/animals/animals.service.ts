@@ -37,6 +37,7 @@ export class AnimalsService {
 
     const [list, total] = await this.animalRepository.findAndCount({
       where,
+      relations: ['cage'],
       order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -48,7 +49,7 @@ export class AnimalsService {
   async findOne(id: number): Promise<Animal> {
     const animal = await this.animalRepository.findOne({
       where: { id },
-      relations: ['healthRecords', 'feedingRecords', 'experimentAnimals'],
+      relations: ['healthRecords', 'feedingRecords', 'experimentAnimals', 'cage'],
     });
     if (!animal) {
       throw new NotFoundException(`动物 #${id} 不存在`);
