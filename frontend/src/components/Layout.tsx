@@ -13,6 +13,7 @@ import {
   MenuOutlined,
   UserOutlined,
   LogoutOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -21,6 +22,7 @@ const { Title, Text } = Typography;
 const menuItems = [
   { key: '/dashboard', icon: <DashboardOutlined />, label: '系统首页' },
   { key: '/animals', icon: <BugOutlined />, label: '动物管理' },
+  { key: '/cages', icon: <HomeOutlined />, label: '笼舍管理' },
   { key: '/health', icon: <HeartOutlined />, label: '健康记录' },
   { key: '/experiments', icon: <ExperimentOutlined />, label: '实验项目' },
   { key: '/feeding', icon: <CoffeeOutlined />, label: '饲养记录' },
@@ -40,6 +42,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout }) => {
   const { token } = theme.useToken();
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  const getSelectedKey = () => {
+    const path = location.pathname;
+    const match = menuItems.find((item) => path === item.key || path.startsWith(item.key + '/'));
+    return match ? match.key : path;
+  };
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+    const match = menuItems.find((item) => path === item.key || path.startsWith(item.key + '/'));
+    return match?.label || '实验室动物信息管理系统';
+  };
 
   const handleMenuClick = (key: string) => {
     navigate(key);
@@ -90,7 +104,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout }) => {
       </div>
       <Menu
         mode="inline"
-        selectedKeys={[location.pathname]}
+        selectedKeys={[getSelectedKey()]}
         items={menuItems}
         onClick={({ key }) => handleMenuClick(key)}
         style={{ border: 'none', padding: '8px' }}
@@ -168,7 +182,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ user, onLogout }) => {
               />
             )}
             <Title level={5} style={{ margin: 0, color: token.colorTextHeading }}>
-              {menuItems.find((item) => item.key === location.pathname)?.label || '实验室动物信息管理系统'}
+              {getPageTitle()}
             </Title>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

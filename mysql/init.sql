@@ -20,6 +20,23 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
 -- ========================================
+-- 笼舍管理表
+-- ========================================
+CREATE TABLE IF NOT EXISTS `cages` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `cage_number` VARCHAR(50) NOT NULL UNIQUE COMMENT '笼舍编号',
+  `room` VARCHAR(100) NOT NULL COMMENT '所在房间',
+  `cage_type` VARCHAR(50) NOT NULL COMMENT '笼舍类型',
+  `max_capacity` INT NOT NULL COMMENT '最大容量',
+  `status` ENUM('available', 'in_use', 'full', 'maintenance') NOT NULL DEFAULT 'available' COMMENT '状态(空闲/使用中/满员/维护中)',
+  `description` TEXT COMMENT '备注描述',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_status` (`status`),
+  INDEX `idx_room` (`room`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='笼舍管理表';
+
+-- ========================================
 -- 动物基本信息表
 -- ========================================
 CREATE TABLE IF NOT EXISTS `animals` (
@@ -32,14 +49,17 @@ CREATE TABLE IF NOT EXISTS `animals` (
   `weight` DECIMAL(10, 2) DEFAULT NULL COMMENT '体重(g)',
   `status` ENUM('healthy', 'sick', 'in_experiment', 'deceased', 'quarantine') NOT NULL DEFAULT 'healthy' COMMENT '状态',
   `cage_number` VARCHAR(50) DEFAULT NULL COMMENT '笼号',
+  `cage_id` INT DEFAULT NULL COMMENT '笼舍ID',
   `rfid_tag` VARCHAR(100) DEFAULT NULL COMMENT 'RFID标签',
   `source` VARCHAR(200) DEFAULT NULL COMMENT '来源',
   `description` TEXT COMMENT '备注描述',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`cage_id`) REFERENCES `cages`(`id`) ON DELETE SET NULL,
   INDEX `idx_species` (`species`),
   INDEX `idx_status` (`status`),
-  INDEX `idx_cage` (`cage_number`)
+  INDEX `idx_cage` (`cage_number`),
+  INDEX `idx_cage_id` (`cage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='动物基本信息表';
 
 -- ========================================
@@ -129,21 +149,36 @@ CREATE TABLE IF NOT EXISTS `feeding_records` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='饲养记录表';
 
 -- ========================================
+-- 种子数据：笼舍信息
+-- ========================================
+INSERT INTO `cages` (`cage_number`, `room`, `cage_type`, `max_capacity`, `status`, `description`) VALUES
+('A-101', 'A栋1层-小鼠室', '小鼠笼', 5, 'in_use', '标准小鼠饲养笼'),
+('A-102', 'A栋1层-小鼠室', '小鼠笼', 5, 'in_use', '实验用小鼠笼'),
+('A-103', 'A栋1层-小鼠室', '小鼠笼', 5, 'in_use', 'ICR小鼠饲养笼'),
+('B-201', 'B栋2层-大鼠室', '大鼠笼', 3, 'in_use', '标准大鼠饲养笼'),
+('B-202', 'B栋2层-大鼠室', '大鼠笼', 3, 'in_use', '实验用大鼠笼'),
+('C-301', 'C栋3层-兔室', '兔笼', 2, 'in_use', '标准兔饲养笼'),
+('C-302', 'C栋3层-兔室', '兔笼', 2, 'in_use', '检疫用兔笼'),
+('D-401', 'D栋4层-豚鼠室', '豚鼠笼', 4, 'in_use', '标准豚鼠饲养笼'),
+('E-501', 'E栋5层-备用室', '通用笼', 10, 'available', '备用笼舍'),
+('E-502', 'E栋5层-备用室', '通用笼', 10, 'maintenance', '正在维修中');
+
+-- ========================================
 -- 种子数据：动物信息
 -- ========================================
-INSERT INTO `animals` (`name`, `species`, `breed`, `gender`, `birth_date`, `weight`, `status`, `cage_number`, `rfid_tag`, `source`, `description`) VALUES
-('M-001', '小鼠', 'C57BL/6', 'male', '2025-06-15', 25.30, 'healthy', 'A-101', 'RFID-2025-0001', '北京维通利华实验动物中心', '健康雄性C57BL/6小鼠，用于免疫学研究'),
-('M-002', '小鼠', 'C57BL/6', 'female', '2025-06-15', 21.50, 'healthy', 'A-101', 'RFID-2025-0002', '北京维通利华实验动物中心', '健康雌性C57BL/6小鼠'),
-('M-003', '小鼠', 'BALB/c', 'male', '2025-07-01', 23.80, 'in_experiment', 'A-102', 'RFID-2025-0003', '上海斯莱克实验动物中心', '正在参与药效评价实验'),
-('M-004', '小鼠', 'BALB/c', 'female', '2025-07-01', 20.10, 'in_experiment', 'A-102', 'RFID-2025-0004', '上海斯莱克实验动物中心', '正在参与药效评价实验'),
-('M-005', '小鼠', 'ICR', 'male', '2025-08-10', 28.60, 'healthy', 'A-103', 'RFID-2025-0005', '广东省医学实验动物中心', '常规饲养ICR小鼠'),
-('R-001', '大鼠', 'SD', 'male', '2025-05-20', 320.50, 'healthy', 'B-201', 'RFID-2025-0006', '北京维通利华实验动物中心', '健康SD大鼠，用于毒理学研究'),
-('R-002', '大鼠', 'SD', 'female', '2025-05-20', 280.30, 'sick', 'B-201', 'RFID-2025-0007', '北京维通利华实验动物中心', '近期出现食欲下降，需观察'),
-('R-003', '大鼠', 'Wistar', 'male', '2025-06-01', 350.00, 'in_experiment', 'B-202', 'RFID-2025-0008', '上海斯莱克实验动物中心', '参与神经行为学实验'),
-('RB-001', '兔', '新西兰白兔', 'female', '2025-03-15', 2800.00, 'healthy', 'C-301', 'RFID-2025-0009', '山东鲁抗实验动物中心', '用于抗体生产'),
-('RB-002', '兔', '新西兰白兔', 'male', '2025-04-01', 3200.00, 'quarantine', 'C-302', 'RFID-2025-0010', '山东鲁抗实验动物中心', '新到检疫中'),
-('GP-001', '豚鼠', 'Hartley', 'male', '2025-07-20', 450.00, 'healthy', 'D-401', 'RFID-2025-0011', '广东省医学实验动物中心', '用于过敏性测试'),
-('GP-002', '豚鼠', 'Hartley', 'female', '2025-07-20', 380.00, 'healthy', 'D-401', 'RFID-2025-0012', '广东省医学实验动物中心', '用于过敏性测试');
+INSERT INTO `animals` (`name`, `species`, `breed`, `gender`, `birth_date`, `weight`, `status`, `cage_number`, `cage_id`, `rfid_tag`, `source`, `description`) VALUES
+('M-001', '小鼠', 'C57BL/6', 'male', '2025-06-15', 25.30, 'healthy', 'A-101', 1, 'RFID-2025-0001', '北京维通利华实验动物中心', '健康雄性C57BL/6小鼠，用于免疫学研究'),
+('M-002', '小鼠', 'C57BL/6', 'female', '2025-06-15', 21.50, 'healthy', 'A-101', 1, 'RFID-2025-0002', '北京维通利华实验动物中心', '健康雌性C57BL/6小鼠'),
+('M-003', '小鼠', 'BALB/c', 'male', '2025-07-01', 23.80, 'in_experiment', 'A-102', 2, 'RFID-2025-0003', '上海斯莱克实验动物中心', '正在参与药效评价实验'),
+('M-004', '小鼠', 'BALB/c', 'female', '2025-07-01', 20.10, 'in_experiment', 'A-102', 2, 'RFID-2025-0004', '上海斯莱克实验动物中心', '正在参与药效评价实验'),
+('M-005', '小鼠', 'ICR', 'male', '2025-08-10', 28.60, 'healthy', 'A-103', 3, 'RFID-2025-0005', '广东省医学实验动物中心', '常规饲养ICR小鼠'),
+('R-001', '大鼠', 'SD', 'male', '2025-05-20', 320.50, 'healthy', 'B-201', 4, 'RFID-2025-0006', '北京维通利华实验动物中心', '健康SD大鼠，用于毒理学研究'),
+('R-002', '大鼠', 'SD', 'female', '2025-05-20', 280.30, 'sick', 'B-201', 4, 'RFID-2025-0007', '北京维通利华实验动物中心', '近期出现食欲下降，需观察'),
+('R-003', '大鼠', 'Wistar', 'male', '2025-06-01', 350.00, 'in_experiment', 'B-202', 5, 'RFID-2025-0008', '上海斯莱克实验动物中心', '参与神经行为学实验'),
+('RB-001', '兔', '新西兰白兔', 'female', '2025-03-15', 2800.00, 'healthy', 'C-301', 6, 'RFID-2025-0009', '山东鲁抗实验动物中心', '用于抗体生产'),
+('RB-002', '兔', '新西兰白兔', 'male', '2025-04-01', 3200.00, 'quarantine', 'C-302', 7, 'RFID-2025-0010', '山东鲁抗实验动物中心', '新到检疫中'),
+('GP-001', '豚鼠', 'Hartley', 'male', '2025-07-20', 450.00, 'healthy', 'D-401', 8, 'RFID-2025-0011', '广东省医学实验动物中心', '用于过敏性测试'),
+('GP-002', '豚鼠', 'Hartley', 'female', '2025-07-20', 380.00, 'healthy', 'D-401', 8, 'RFID-2025-0012', '广东省医学实验动物中心', '用于过敏性测试');
 
 -- ========================================
 -- 种子数据：健康记录

@@ -5,10 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { HealthRecord } from '../../health/entities/health-record.entity';
 import { ExperimentAnimal } from '../../experiments/entities/experiment-animal.entity';
 import { FeedingRecord } from '../../feeding/entities/feeding-record.entity';
+import { Cage } from '../../cages/entities/cage.entity';
 
 @Entity('animals')
 export class Animal {
@@ -42,6 +45,10 @@ export class Animal {
 
   @Column({ name: 'cage_number', length: 50, nullable: true })
   cageNumber: string;
+
+  @ManyToOne(() => Cage, (cage) => cage.animals, { nullable: true })
+  @JoinColumn({ name: 'cage_id' })
+  cage: Cage;
 
   @Column({ name: 'rfid_tag', length: 100, nullable: true })
   rfidTag: string;

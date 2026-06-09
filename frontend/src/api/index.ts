@@ -59,6 +59,20 @@ export const animalApi = {
   getSpecies: () => api.get('/animals/species'),
 };
 
+// ========== 笼舍管理 API ==========
+export const cageApi = {
+  getList: (params?: any) => api.get('/cages', { params }),
+  getDetail: (id: number) => api.get(`/cages/${id}`),
+  create: (data: any) => api.post('/cages', data),
+  update: (id: number, data: any) => api.patch(`/cages/${id}`, data),
+  delete: (id: number) => api.delete(`/cages/${id}`),
+  assignAnimal: (cageId: number, animalId: number) =>
+    api.post(`/cages/${cageId}/animals/${animalId}`),
+  removeAnimal: (cageId: number, animalId: number) =>
+    api.delete(`/cages/${cageId}/animals/${animalId}`),
+  getAvailableAnimals: () => api.get('/cages/available-animals'),
+};
+
 // ========== 健康记录 API ==========
 export const healthApi = {
   getList: (params?: any) => api.get('/health-records', { params }),

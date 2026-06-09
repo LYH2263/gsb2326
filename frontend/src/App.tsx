@@ -5,6 +5,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AnimalList from './pages/AnimalList';
+import CageList from './pages/CageList';
+import CageDetail from './pages/CageDetail';
 import HealthRecords from './pages/HealthRecords';
 import Experiments from './pages/Experiments';
 import FeedingRecords from './pages/FeedingRecords';
@@ -73,6 +75,8 @@ const App: React.FC = () => {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="animals" element={<AnimalList />} />
+            <Route path="cages" element={<CageList />} />
+            <Route path="cages/:id" element={<CageDetail />} />
             <Route path="health" element={<HealthRecords />} />
             <Route path="experiments" element={<Experiments />} />
             <Route path="feeding" element={<FeedingRecords />} />
